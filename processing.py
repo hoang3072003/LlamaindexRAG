@@ -11,8 +11,8 @@ from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageCon
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.vector_stores.chroma import ChromaVectorStore
 from llama_index.core.memory import ChatMemoryBuffer
-from llama_index.llms.gemini import Gemini
 from llama_index.core import Settings
+from llama_index.llms.gemini import Gemini
 
 GOOGLE_API_KEY = "AIzaSyCVSFxhcx5B-b4pmW1Ywy1TEoK1xOGTbjg"
 Settings.llm = Gemini(api_key=GOOGLE_API_KEY)

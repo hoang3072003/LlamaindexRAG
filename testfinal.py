@@ -134,18 +134,18 @@ def main() -> None:
                     with message_container.chat_message("user", avatar="😎"):
                         st.markdown(transcribed_text)
 
-                    if "draw" in transcribed_text.lower():
-                        st.write("Detected 'draw' in the speech. Generating image...")
-                        try:
-                            image_url = generate_image(transcribed_text)
-                            st.image(image_url, caption=f"Generated Image: {transcribed_text}", use_column_width=True)
-                        except Exception as e:
-                            st.error(f"Error generating image: {e}")
-                    else:
-                        bot_response = chatbot_response(transcribed_text)
-                        with message_container.chat_message("assistant", avatar="🤖"):
-                            st.markdown(bot_response)
-                        st.session_state["messages"].append({"role": "assistant", "content": bot_response})
+                    # if "draw" in transcribed_text.lower():
+                    #     st.write("Detected 'draw' in the speech. Generating image...")
+                    #     try:
+                    #         image_url = generate_image(transcribed_text)
+                    #         st.image(image_url, caption=f"Generated Image: {transcribed_text}", use_column_width=True)
+                    #     except Exception as e:
+                    #         st.error(f"Error generating image: {e}")
+                    # else:
+                    bot_response = chatbot_response(transcribed_text)
+                    with message_container.chat_message("assistant", avatar="🤖"):
+                        st.markdown(bot_response)
+                    st.session_state["messages"].append({"role": "assistant", "content": bot_response})
 
             else:  # Xử lý đầu vào dạng Text
                 if prompt := st.chat_input("Enter a prompt here..."):
@@ -153,18 +153,18 @@ def main() -> None:
                     with message_container.chat_message("user", avatar="😎"):
                         st.markdown(prompt)
 
-                    if "draw" in prompt.lower():
-                        st.write("Detected 'draw' in the prompt. Generating image...")
-                        try:
-                            image_url = generate_image(prompt)
-                            st.image(image_url, caption=f"Generated Image: {prompt}", use_container_width=True)
-                        except Exception as e:
-                            st.error(f"Error generating image: {e}")
-                    else:
-                        bot_response = chatbot_response(prompt)
-                        with message_container.chat_message("assistant", avatar="🤖"):
-                            st.markdown(bot_response)
-                        st.session_state["messages"].append({"role": "assistant", "content": bot_response})
+                    # if "draw" in prompt.lower():
+                    #     st.write("Detected 'draw' in the prompt. Generating image...")
+                    #     try:
+                    #         image_url = generate_image(prompt)
+                    #         st.image(image_url, caption=f"Generated Image: {prompt}", use_container_width=True)
+                    #     except Exception as e:
+                    #         st.error(f"Error generating image: {e}")
+                    # else:
+                    bot_response = chatbot_response(prompt)
+                    with message_container.chat_message("assistant", avatar="🤖"):
+                        st.markdown(bot_response)
+                    st.session_state["messages"].append({"role": "assistant", "content": bot_response})
 
         elif file_upload and input_method == "Text":  # Khi có file được tải lên
             if prompt := st.chat_input("Enter a prompt related to the uploaded file..."):
@@ -172,33 +172,41 @@ def main() -> None:
                 with message_container.chat_message("user", avatar="😎"):
                     st.markdown(prompt)
 
-                if "draw" in prompt.lower():
-                    st.write("Detected 'draw' in the prompt. Generating image...")
-                    try:
-                        image_url = generate_image(prompt)
-                        st.image(image_url, caption=f"Generated Image: {prompt}", use_column_width=True)
-                    except Exception as e:
-                        st.error(f"Error generating image: {e}")
-                else:
-                    if file_upload_type == "pdf" and st.session_state["vector_db"]:  # Nếu file là PDF
-                        response = process_question_with_llamaindex(prompt, st.session_state["vector_db"])
-                        st.session_state["messages"].append({"role": "assistant", "content": response})
-                        with message_container.chat_message("assistant", avatar="🤖"):
-                            st.markdown(response)
-                        # sample_rate, audio_array = tts_service.synthesize(response)
-                        # sd.play(audio_array, samplerate=sample_rate)
+                # if "draw" in prompt.lower():
+                #     st.write("Detected 'draw' in the prompt. Generating image...")
+                #     try:
+                #         image_url = generate_image(prompt)
+                #         st.image(image_url, caption=f"Generated Image: {prompt}", use_column_width=True)
+                #     except Exception as e:
+                #         st.error(f"Error generating image: {e}")
+                
+                if file_upload_type == "pdf" and st.session_state["vector_db"]:  # Nếu file là PDF
+                    response = process_question_with_llamaindex(prompt, st.session_state["vector_db"])
+                    st.session_state["messages"].append({"role": "assistant", "content": response})
+                    with message_container.chat_message("assistant", avatar="🤖"):
+                        st.markdown(response)
+                        # message_index = len(st.session_state['messages']) - 1
+                        # if st.button("🔊 Nghe phản hồi", key=f"listen_{message_index}"):
+                        #     sample_rate, audio_array = tts_service.synthesize(response)
+                        #     sd.play(audio_array, samplerate=sample_rate)
+                    sample_rate, audio_array = tts_service.synthesize(response)
+                    sd.play(audio_array, samplerate=sample_rate)
 
-                    elif file_upload_type == "image":  # Nếu file là ảnh
-                        with st.spinner("Describing the uploaded image..."):
-                            try:
-                                image_description = describe_image(file_upload, prompt)
-                                st.session_state["messages"].append({"role": "assistant", "content": image_description})
-                                with message_container.chat_message("assistant", avatar="🤖"):
-                                    st.markdown(image_description)
-                            except Exception as e:
-                                st.error(f"Error describing image: {e}")
+                elif file_upload_type == "image":  # Nếu file là ảnh
+                    with st.spinner("Describing the uploaded image..."):
+                        try:
+                            image_description = describe_image(file_upload, prompt)
+                            st.session_state["messages"].append({"role": "assistant", "content": image_description})
+                            with message_container.chat_message("assistant", avatar="🤖"):
+                                st.markdown(image_description)
+                                # if st.button("🔊 Nghe phản hồi", key=f"listen_{len(st.session_state['messages'])}"):
+                                #     sample_rate, audio_array = tts_service.synthesize(image_description)
+                                #     sd.play(audio_array, samplerate=sample_rate)
+                        except Exception as e:
+                            st.error(f"Error describing image: {e}")
 
-
+# def show_image(image):
+#     st.image(image, caption="Generated Image", use_column_width=True)
 
 if __name__ == "__main__":
     main()
